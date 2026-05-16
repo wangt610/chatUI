@@ -1,8 +1,8 @@
-name: Android Chat CI (自动拉取C++仓库)
+name: Android Chat CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]  # 你的默认分支是 master
   workflow_dispatch:
 
 jobs:
@@ -10,22 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout chatUI 代码
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: 设置 JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
-      - name: Grant execute permission
+      - name: 给 gradlew 执行权限
         run: chmod +x gradlew
 
-      - name: Build APK (自动拉取 dsvm 仓库并编译 C++)
+      - name: 构建 Release APK
         run: ./gradlew assembleRelease
 
-      - name: Upload APK
+      - name: 上传构建产物 APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
+          name: chatui-release-apk
           path: app/build/outputs/apk/release/*.apk
